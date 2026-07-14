@@ -1105,14 +1105,57 @@
       </article>
 
 
+      <!--
+        - #CONTACT
+      -->
 
+      <article class="contact" data-page="contact">
+
+        <header>
+          <h2 class="h2 article-title">Contact</h2>
+        </header>
+
+        <section class="mapbox" data-mapbox>
+          <figure>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d11689.899565209007!2d77.08433407226667!3d28.6219474985687!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1754423942369!5m2!1sen!2sin"
+              width="400" height="300" loading="lazy"></iframe>
+          </figure>
+        </section>
+
+        <section class="contact-form">
+
+          <h3 class="h3 form-title">Contact Form</h3>
+
+          <form id="contact-form" class="form" data-form>
+
+            <div class="input-wrapper">
+              <input type="text" name="fullname" id="fullname" class="form-input" placeholder="Full name" required data-form-input>
+
+              <input type="email" name="email" id="email" class="form-input" placeholder="Email address" required data-form-input>
+            </div>
+
+            <textarea name="message" id="message" class="form-input" placeholder="Your Message" required data-form-input></textarea>
+
+            <button class="form-btn" type="submit" id="submit-btn" data-form-btn>
+              <ion-icon name="paper-plane"></ion-icon>
+              <span>Send Message</span>
+            </button>
+
+            <p id="form-status" style="margin-top: 10px; font-size: 14px;"></p>
+
+          </form>
+
+        </section>
+
+      </article>
 
 
       <!--
         - #CONTACT
       -->
 
-      <article class="contact" data-page="contact">
+      <!-- <article class="contact" data-page="contact">
 
         <header>
           <h2 class="h2 article-title">Contact</h2>
@@ -1149,7 +1192,7 @@
 
         </section>
 
-      </article>
+      </article> -->
 
     </div>
 
@@ -1170,6 +1213,71 @@
   -->
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // ============================================
+    // REPLACE THIS WITH YOUR FIREBASE CONFIG
+    // ============================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyAqrOIDUrYP7eKjwkO_F9BeOuKFPct-U0g",
+      authDomain: "portfolio-ce496.firebaseapp.com",
+      projectId: "portfolio-ce496",
+      storageBucket: "portfolio-ce496.firebasestorage.app",
+      messagingSenderId: "241988654883",
+      appId: "1:241988654883:web:aea4891339fa94de8cde96",
+      measurementId: "G-LX1HMBG7JL"
+    };
+    // ============================================
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("contact-form");
+    const statusEl = document.getElementById("form-status");
+    const submitBtn = document.getElementById("submit-btn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const fullname = document.getElementById("fullname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!fullname || !email || !message) {
+        statusEl.textContent = "Please fill all fields.";
+        statusEl.style.color = "red";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      statusEl.textContent = "Sending...";
+      statusEl.style.color = "gray";
+
+      try {
+        await addDoc(collection(db, "contactMessages"), {
+          fullname: fullname,
+          email: email,
+          message: message,
+          createdAt: serverTimestamp()
+        });
+
+        statusEl.textContent = "Message sent successfully!";
+        statusEl.style.color = "green";
+        form.reset();
+
+      } catch (error) {
+        console.error("Error saving message:", error);
+        statusEl.textContent = "Something went wrong. Try again.";
+        statusEl.style.color = "red";
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
 
 </body>
 
